@@ -87,6 +87,28 @@ func (feed *Feed) get() ([]byte, error) {
 }
 
 
+// Unmarshal raw feed into an object.
+func (feed *Feed) unmarshal(bs []byte) error {
+	var err error
+
+	// Unmarshal based on feed's schema type.
+	switch {
+	case feed.Schema == "npr":
+		feed.Object, err = nprUnmarshal(bs)
+		if err != nil {
+			return err
+		}
+		return nil
+	case feed.Schema == "youtube":
+		feed.Object, err = youtubeUnmarshal(bs)
+		if err != nil {
+			return err
+		}
+		return nil
+	}
+	return fmt.Errorf("schema of feed '%s' unknown", feed.Id)
+}
+
 // Unmarshal a NPR feed.
 func nprUnmarshal(bs []byte) (schema.NPRFeed, error) {
 	nprFeed := new(schema.NPRFeed)
