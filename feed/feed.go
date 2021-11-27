@@ -14,6 +14,7 @@ type Feed struct {
 	Source  string `json:"source"`
 	Schema  string `json:"schema"`
 	DumpDir string
+	Object  interface{}
 }
 
 func (feed *Feed) Validate(baseDumpDir string) error {
