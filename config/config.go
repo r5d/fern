@@ -10,19 +10,14 @@ import (
 	"path"
 	"strings"
 
+	"ricketyspace.net/fern/feed"
 	"ricketyspace.net/fern/file"
 )
 
-type Feed struct {
-	Id     string `json:"id"`
-	Source string `json:"source"`
-	Schema string `json:"schema"`
-}
-
 type FernConfig struct {
-	YDLPath string `json:"ydl-path"`
-	DumpDir string `json:"dump-dir"`
-	Feeds   []Feed `json:"feeds"`
+	YDLPath string      `json:"ydl-path"`
+	DumpDir string      `json:"dump-dir"`
+	Feeds   []feed.Feed `json:"feeds"`
 }
 
 func Read() (*FernConfig, error) {
@@ -92,36 +87,11 @@ func (config *FernConfig) validate() error {
 		return fmt.Errorf("'feeds' not set in config")
 	}
 	for _, feed := range config.Feeds {
-		err = feed.validate()
+		err = feed.Validate(config.DumpDir)
 		if err != nil {
 			return err
 		}
 	}
 	return nil
 
-}
-
-func (feed *Feed) validate() error {
-	// Check 'id'
-	if len(feed.Id) == 0 {
-		return fmt.Errorf("'id' not set in a feed")
-	}
-
-	// Check 'source'
-	if len(feed.Source) == 0 {
-		return fmt.Errorf("'source' not set in a feed '%s'", feed.Id)
-	}
-
-	// Check 'schema'
-	schemaOK := false
-	for _, schema := range []string{"npr", "youtube"} {
-		if feed.Schema == schema {
-			schemaOK = true
-		}
-	}
-	if !schemaOK {
-		return fmt.Errorf("schema '%s' for feed '%s' is not valid",
-			feed.Schema, feed.Id)
-	}
-	return nil
 }
