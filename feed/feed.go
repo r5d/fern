@@ -5,6 +5,8 @@ package feed
 
 import (
 	"fmt"
+	"io"
+	"net/http"
 	"os"
 	"path"
 )
@@ -54,3 +56,29 @@ func (feed *Feed) Validate(baseDumpDir string) error {
 
 	return nil
 }
+
+// Get the feed.
+func (feed *Feed) get() ([]byte, error) {
+	// Init byte container to store feed content.
+	bs := make([]byte, 0)
+
+	resp, err := http.Get(feed.Source)
+	if err != nil {
+		return bs, err
+	}
+
+	// Slurp body.
+	chunk := make([]byte, 100)
+	for {
+		c, err := resp.Body.Read(chunk)
+		if c < 1 {
+			break
+		}
+		if err != nil && err != io.EOF {
+			return bs, err
+		}
+		bs = append(bs, chunk[0:c]...)
+	}
+	return bs, nil
+}
+
