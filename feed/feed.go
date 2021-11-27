@@ -105,3 +105,20 @@ func nprUnmarshal(bs []byte) (schema.NPRFeed, error) {
 	return *nprFeed, nil
 }
 
+// Unmarshal a YouTube feed.
+func youtubeUnmarshal(bs []byte) (schema.YouTubeFeed, error) {
+	ytFeed := new(schema.YouTubeFeed)
+	err := xml.Unmarshal(bs, ytFeed)
+	if err != nil {
+		return *ytFeed, err
+	}
+
+	// Parse time for all entries.
+	for i, entry := range ytFeed.Entries {
+		ytFeed.Entries[i].PubTime, err = time.Parse(time.RFC3339, entry.Pub)
+		if err != nil {
+			return *ytFeed, err
+		}
+	}
+	return *ytFeed, nil
+}
