@@ -4,11 +4,15 @@
 package feed
 
 import (
+	"encoding/xml"
 	"fmt"
 	"io"
 	"net/http"
 	"os"
 	"path"
+	"time"
+
+	"ricketyspace.net/fern/schema"
 )
 
 type Feed struct {
@@ -80,5 +84,24 @@ func (feed *Feed) get() ([]byte, error) {
 		bs = append(bs, chunk[0:c]...)
 	}
 	return bs, nil
+}
+
+
+// Unmarshal a NPR feed.
+func nprUnmarshal(bs []byte) (schema.NPRFeed, error) {
+	nprFeed := new(schema.NPRFeed)
+	err := xml.Unmarshal(bs, nprFeed)
+	if err != nil {
+		return *nprFeed, err
+	}
+
+	// Parse time for all entries.
+	for i, entry := range nprFeed.Entries {
+		nprFeed.Entries[i].PubTime, err = time.Parse(time.RFC1123Z, entry.Pub)
+		if err != nil {
+			return *nprFeed, err
+		}
+	}
+	return *nprFeed, nil
 }
 
