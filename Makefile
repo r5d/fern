@@ -4,4 +4,4 @@ fern: fmt
 	go build
 
 fmt:
-	go fmt ${MOD}
+	go fmt ${MOD} ${MOD}/config ${MOD}/file ${MOD}/schema
