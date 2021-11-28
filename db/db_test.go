@@ -69,14 +69,16 @@ func TestOpenExistingDB(t *testing.T) {
 	// Write a sample test db to fern-db.json
 	testDBJSON := []byte(`{"mkbhd":["rivian","v-raptor","m1-imac"],"npr":["william-prince","joy-oladokun","lucy-ducas"],"simone":["weightless","ugly-desks","safety-hat"]}`)
 	dbFile, err := os.Create(dbPath)
+	defer dbFile.Close()
 	if err != nil {
 		t.Errorf("Unable to create fern-db.json: %v", err.Error())
+		return
 	}
 	n, err := dbFile.Write(testDBJSON)
 	if len(testDBJSON) != n {
 		t.Errorf("Write to fern-db.json failed: %v", err.Error())
+		return
 	}
-	dbFile.Close()
 
 	// Open the db.
 	db, err := Open()
