@@ -248,3 +248,125 @@ func TestAdd(t *testing.T) {
 		return
 	}
 }
+
+func TestWriteNewDB(t *testing.T) {
+	// Set custom path for db.
+	dbPath = path.Join(os.TempDir(), "fern-db.json")
+	defer os.Remove(dbPath)
+
+	// Open the db.
+	db, err := Open()
+	if err != nil {
+		t.Errorf("db.Open failed: %v", err.Error())
+		return
+	}
+
+	// Populate db with test data and write to db to disk.
+	db.Add("npr", "william-prince")
+	db.Add("npr", "julian-baker")
+	db.Add("mkbhd", "v-raptor")
+	db.Write()
+
+	// Read db refreshly from disk and verify the db contents.
+	db, err = Open()
+	if err != nil {
+		t.Errorf("db.Open failed: %v", err.Error())
+		return
+	}
+	if len(db.downloaded["npr"]) != 2 {
+		t.Errorf("db.Add failed: expected 2 entries for 'npr'")
+		return
+	}
+	if !db.Exists("npr", "william-prince") {
+		t.Errorf("db.Add failed: expected %s in 'npr' feed",
+			"william-prince")
+		return
+	}
+	if !db.Exists("npr", "julian-baker") {
+		t.Errorf("db.Add failed: expected %s in 'npr' feed",
+			"julian-baker")
+		return
+	}
+	if len(db.downloaded["mkbhd"]) != 1 {
+		t.Errorf("db.Add failed: expected 1 entry for 'npr'")
+		return
+	}
+	if !db.Exists("mkbhd", "v-raptor") {
+		t.Errorf("db.Add failed: expected %s in 'mkbhd' feed",
+			"v-raptor")
+		return
+	}
+}
+
+func TestWriteExistingDB(t *testing.T) {
+	// Set custom path for db.
+	dbPath = path.Join(os.TempDir(), "fern-db.json")
+	defer os.Remove(dbPath)
+
+	// Write a sample test db to fern-db.json
+	testDBJSON := []byte(`{"npr":["kurt-vile","joy-oladokun"]}`)
+	dbFile, err := os.Create(dbPath)
+	defer dbFile.Close()
+	if err != nil {
+		t.Errorf("Unable to create fern-db.json: %v", err.Error())
+		return
+	}
+	n, err := dbFile.Write(testDBJSON)
+	if len(testDBJSON) != n {
+		t.Errorf("Write to fern-db.json failed: %v", err.Error())
+		return
+	}
+
+	// Open the db.
+	db, err := Open()
+	if err != nil {
+		t.Errorf("db.Open failed: %v", err.Error())
+		return
+	}
+
+	// Populate db with test data and write to db to disk.
+	db.Add("npr", "william-prince")
+	db.Add("npr", "julian-baker")
+	db.Add("mkbhd", "v-raptor")
+	db.Write()
+
+	// Read db refreshly from disk and verify the db contents.
+	db, err = Open()
+	if err != nil {
+		t.Errorf("db.Open failed: %v", err.Error())
+		return
+	}
+	if len(db.downloaded["npr"]) != 4 {
+		t.Errorf("db.Add failed: expected 2 entries for 'npr'")
+		return
+	}
+	if !db.Exists("npr", "kurt-vile") {
+		t.Errorf("db.Add failed: expected %s in 'npr' feed",
+			"kurt-vile")
+		return
+	}
+	if !db.Exists("npr", "joy-oladokun") {
+		t.Errorf("db.Add failed: expected %s in 'npr' feed",
+			"joy-oladokun")
+		return
+	}
+	if !db.Exists("npr", "william-prince") {
+		t.Errorf("db.Add failed: expected %s in 'npr' feed",
+			"william-prince")
+		return
+	}
+	if !db.Exists("npr", "julian-baker") {
+		t.Errorf("db.Add failed: expected %s in 'npr' feed",
+			"julian-baker")
+		return
+	}
+	if len(db.downloaded["mkbhd"]) != 1 {
+		t.Errorf("db.Add failed: expected 1 entry for 'npr'")
+		return
+	}
+	if !db.Exists("mkbhd", "v-raptor") {
+		t.Errorf("db.Add failed: expected %s in 'mkbhd' feed",
+			"v-raptor")
+		return
+	}
+}

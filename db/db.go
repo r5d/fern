@@ -96,3 +96,28 @@ func (fdb *FernDB) Add(feed, entry string) {
 	fdb.downloaded[feed] = append(fdb.downloaded[feed], entry)
 	fdb.mutex.Unlock()
 }
+
+func (fdb *FernDB) Write() error {
+	if len(dbPath) == 0 {
+		return fmt.Errorf("FernDB path not set")
+	}
+
+	f, err := os.OpenFile(dbPath, os.O_WRONLY|os.O_CREATE, 0644)
+	if err != nil {
+		return err
+	}
+	defer f.Close()
+
+	// Marshal database into json.
+	bs, err := json.Marshal(fdb.downloaded)
+	if err != nil {
+		return err
+	}
+
+	// Write to disk.
+	_, err = f.Write(bs)
+	if err != nil {
+		return err
+	}
+	return nil
+}
