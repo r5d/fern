@@ -46,6 +46,14 @@ func TestOpenNewDB(t *testing.T) {
 		return
 	}
 
+	// Verify that 'mutex' is initialized.
+	if db.mutex == nil {
+		t.Errorf("db.mutex is nil")
+		return
+	}
+	db.mutex.Lock()
+	db.mutex.Unlock()
+
 	// Verify that 'downloaded' is initialized
 	if db.downloaded == nil {
 		t.Errorf("db.downloaded is nil")
@@ -76,6 +84,14 @@ func TestOpenExistingDB(t *testing.T) {
 		t.Errorf("db.Open failed: %v", err.Error())
 		return
 	}
+
+	// Verify that 'mutex' is initialized.
+	if db.mutex == nil {
+		t.Errorf("db.mutex is nil")
+		return
+	}
+	db.mutex.Lock()
+	db.mutex.Unlock()
 
 	// Validate db.downloaded.
 	var entries, expectedEntries []string

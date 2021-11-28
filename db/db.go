@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"os"
 	"path"
+	"sync"
 
 	"ricketyspace.net/fern/file"
 )
@@ -15,6 +16,7 @@ import (
 var dbPath string
 
 type FernDB struct {
+	mutex *sync.Mutex // For writes to `downloaded`
 	// Key: feed-id
 	// Value: feed-id's entries that were downloaded
 	downloaded map[string][]string
@@ -42,6 +44,7 @@ func Open() (*FernDB, error) {
 	if err != nil {
 		// db does not exist yet; create an empty one.
 		db := new(FernDB)
+		db.mutex = new(sync.Mutex)
 		db.downloaded = make(map[string][]string)
 		return db, nil
 	}
@@ -58,6 +61,7 @@ func Open() (*FernDB, error) {
 
 	// Unmarshal db into an object.
 	db := new(FernDB)
+	db.mutex = new(sync.Mutex)
 	err = json.Unmarshal(bs, &db.downloaded)
 	if err != nil {
 		return nil, err
