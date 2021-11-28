@@ -139,3 +139,46 @@ func TestOpenExistingDB(t *testing.T) {
 		}
 	}
 }
+
+func TestExists(t *testing.T) {
+	// Set custom path for db.
+	dbPath = path.Join(os.TempDir(), "fern-db.json")
+	defer os.Remove(dbPath)
+
+	// Write a sample test db to fern-db.json
+	testDBJSON := []byte(`{"npr":["william-prince","joy-oladokun","lucy-ducas"]}`)
+	dbFile, err := os.Create(dbPath)
+	defer dbFile.Close()
+	if err != nil {
+		t.Errorf("Unable to create fern-db.json: %v", err.Error())
+		return
+	}
+	n, err := dbFile.Write(testDBJSON)
+	if len(testDBJSON) != n {
+		t.Errorf("Write to fern-db.json failed: %v", err.Error())
+		return
+	}
+
+	// Open the db.
+	db, err := Open()
+	if err != nil {
+		t.Errorf("db.Open failed: %v", err.Error())
+		return
+	}
+
+	// Test Exists.
+	if db.Exists("mkbhd", "v-raptor") {
+		t.Errorf("db.Exists failed: mkbhd does not exist in db")
+		return
+	}
+	if db.Exists("npr", "julien-baker") {
+		t.Errorf("db.Exists failed: (%s, %s) does not exist in db",
+			"npr", "julien-baker")
+		return
+	}
+	if !db.Exists("npr", "joy-oladokun") {
+		t.Errorf("db.Exists failed: (%s, %s) exists in db",
+			"npr", "joy-oladokun")
+		return
+	}
+}

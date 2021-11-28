@@ -68,3 +68,17 @@ func Open() (*FernDB, error) {
 	}
 	return db, nil
 }
+
+func (fdb *FernDB) Exists(feed, entry string) bool {
+	if _, ok := fdb.downloaded[feed]; !ok {
+		return false
+	}
+	for _, e := range fdb.downloaded[feed] {
+		if e == entry {
+			return true
+		}
+	}
+	return false
+
+}
+
