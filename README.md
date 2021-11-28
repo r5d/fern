@@ -1,10 +1,6 @@
 # fern
 
-RSS/Atom media feed downloader.
-
-Depends on [youtube-dl][ydl] for downloading media.
-
-[ydl]: https://youtube-dl.org
+Work in progress.
 
 ## building
 
