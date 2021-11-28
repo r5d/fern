@@ -82,3 +82,17 @@ func (fdb *FernDB) Exists(feed, entry string) bool {
 
 }
 
+func (fdb *FernDB) Add(feed, entry string) {
+	// Check if entry already exist for feed.
+	if fdb.Exists(feed, entry) {
+		return
+	}
+
+	// Add entry.
+	fdb.mutex.Lock()
+	if _, ok := fdb.downloaded[feed]; !ok {
+		fdb.downloaded[feed] = make([]string, 0)
+	}
+	fdb.downloaded[feed] = append(fdb.downloaded[feed], entry)
+	fdb.mutex.Unlock()
+}
