@@ -8,3 +8,7 @@ fern: fmt
 
 fmt:
 	go fmt ${MOD} ${MOD}/config ${MOD}/file ${MOD}/schema
+
+test:
+	go test -v ${MOD}/db
+.PHONY: test
