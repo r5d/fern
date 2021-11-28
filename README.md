@@ -1,6 +1,6 @@
 # fern
 
-Work in progress.
+Media feed downloader. Work in progress.
 
 ## building
 
