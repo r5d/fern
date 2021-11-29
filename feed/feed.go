@@ -19,12 +19,17 @@ type Feed struct {
 	Id      string `json:"id"`
 	Source  string `json:"source"`
 	Schema  string `json:"schema"`
+	YDLPath string
 	DumpDir string
 	Object  interface{}
 }
 
-func (feed *Feed) Validate(baseDumpDir string) error {
-	_, err := os.Stat(baseDumpDir)
+func (feed *Feed) Validate(ydlPath, baseDumpDir string) error {
+	_, err := os.Stat(ydlPath)
+	if err != nil {
+		return err
+	}
+	_, err = os.Stat(baseDumpDir)
 	if err != nil {
 		return err
 	}
@@ -50,6 +55,9 @@ func (feed *Feed) Validate(baseDumpDir string) error {
 		return fmt.Errorf("schema '%s' for feed '%s' is not valid",
 			feed.Schema, feed.Id)
 	}
+
+	// Set ydl-path for feed.
+	feed.YDLPath = ydlPath
 
 	// Set dump directory for feed and ensure it exists.
 	feed.DumpDir = path.Join(baseDumpDir, feed.Id)
