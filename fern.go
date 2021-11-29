@@ -47,6 +47,12 @@ func main() {
 	}
 	// Wait for all feeds finish processing.
 	for pState.FeedsProcessing > 0 {
+		fTxt := "feeds"
+		if pState.FeedsProcessing == 1 {
+			fTxt = "feed"
+		}
+		fmt.Printf("Waiting for %d %s to finish processing\n",
+			pState.FeedsProcessing, fTxt)
 		fr := <-pState.FeedResultChan
 		if fr.Err == nil {
 			fmt.Printf("[%s]: %s\n",
