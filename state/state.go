@@ -3,6 +3,8 @@
 
 package state
 
+import "ricketyspace.net/fern/db"
+
 // Contains the result of processing a Feed.
 type FeedResult struct {
 	FeedId     string // Feed's identifier
@@ -20,6 +22,7 @@ type EntryResult struct {
 type ProcessState struct {
 	YDLPath string
 	DumpDir string
+	DB      *db.FernDB
 	// Channel for Feed.Process goroutines to communicate to the
 	// caller about the number of entries that are being
 	// downloaded for a feed.
