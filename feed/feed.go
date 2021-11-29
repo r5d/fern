@@ -144,6 +144,12 @@ func (feed *Feed) Process(pState *state.ProcessState) {
 	}
 	// Wait for all entries to finish processing.
 	for processing > 0 {
+		eTxt := "entries"
+		if processing == 1 {
+			eTxt = "entry"
+		}
+		fmt.Printf("[%s]: Waiting for %d %s to finish processing\n",
+			feed.Id, processing, eTxt)
 		er := <-erChan
 		if er.Err == nil {
 			fmt.Printf("[%s][%s]: Downloaded '%s'\n",
