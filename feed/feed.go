@@ -26,12 +26,8 @@ type Feed struct {
 	Entries []schema.Entry
 }
 
-func (feed *Feed) Validate(ydlPath, baseDumpDir string) error {
-	_, err := os.Stat(ydlPath)
-	if err != nil {
-		return err
-	}
-	_, err = os.Stat(baseDumpDir)
+func (feed *Feed) Validate(baseDumpDir string) error {
+	_, err := os.Stat(baseDumpDir)
 	if err != nil {
 		return err
 	}
@@ -62,9 +58,6 @@ func (feed *Feed) Validate(ydlPath, baseDumpDir string) error {
 	if feed.Last < 1 {
 		return fmt.Errorf("'last' not set or 0 in a feed '%s'", feed.Id)
 	}
-
-	// Set ydl-path for feed.
-	feed.YDLPath = ydlPath
 
 	// Set dump directory for feed and ensure it exists.
 	feed.DumpDir = path.Join(baseDumpDir, feed.Id)

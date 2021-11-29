@@ -86,11 +86,13 @@ func (config *FernConfig) validate() error {
 	if len(config.Feeds) == 0 {
 		return fmt.Errorf("'feeds' not set in config")
 	}
-	for _, feed := range config.Feeds {
-		err = feed.Validate(config.YDLPath, config.DumpDir)
+	for i, feed := range config.Feeds {
+		err = feed.Validate(config.DumpDir)
 		if err != nil {
 			return err
 		}
+		config.Feeds[i].YDLPath = config.YDLPath
+		config.Feeds[i].DumpDir = feed.DumpDir
 	}
 	return nil
 
