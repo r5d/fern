@@ -21,7 +21,7 @@ type Feed struct {
 	Schema  string `json:"schema"`
 	YDLPath string
 	DumpDir string
-	Object  interface{}
+	Entries []schema.Entry
 }
 
 func (feed *Feed) Validate(ydlPath, baseDumpDir string) error {
@@ -102,13 +102,13 @@ func (feed *Feed) unmarshal(bs []byte) error {
 	// Unmarshal based on feed's schema type.
 	switch {
 	case feed.Schema == "npr":
-		feed.Object, err = nprUnmarshal(bs)
+		feed.Entries, err = nprUnmarshal(bs)
 		if err != nil {
 			return err
 		}
 		return nil
 	case feed.Schema == "youtube":
-		feed.Object, err = youtubeUnmarshal(bs)
+		feed.Entries, err = youtubeUnmarshal(bs)
 		if err != nil {
 			return err
 		}
@@ -118,37 +118,43 @@ func (feed *Feed) unmarshal(bs []byte) error {
 }
 
 // Unmarshal a NPR feed.
-func nprUnmarshal(bs []byte) (schema.NPRFeed, error) {
+func nprUnmarshal(bs []byte) ([]schema.Entry, error) {
 	nprFeed := new(schema.NPRFeed)
 	err := xml.Unmarshal(bs, nprFeed)
 	if err != nil {
-		return *nprFeed, err
+		return nil, err
 	}
 
-	// Parse time for all entries.
-	for i, entry := range nprFeed.Entries {
-		nprFeed.Entries[i].PubTime, err = time.Parse(time.RFC1123Z, entry.Pub)
+	// Get all entries.
+	entries := make([]schema.Entry, 0)
+	for _, e := range nprFeed.Entries {
+		t, err := time.Parse(time.RFC1123Z, e.Pub)
 		if err != nil {
-			return *nprFeed, err
+			return nil, err
 		}
+		entry := schema.Entry{e.Id, e.Title, t, e.Link.Url}
+		entries = append(entries, entry)
 	}
-	return *nprFeed, nil
+	return entries, nil
 }
 
 // Unmarshal a YouTube feed.
-func youtubeUnmarshal(bs []byte) (schema.YouTubeFeed, error) {
+func youtubeUnmarshal(bs []byte) ([]schema.Entry, error) {
 	ytFeed := new(schema.YouTubeFeed)
 	err := xml.Unmarshal(bs, ytFeed)
 	if err != nil {
-		return *ytFeed, err
+		return nil, err
 	}
 
-	// Parse time for all entries.
-	for i, entry := range ytFeed.Entries {
-		ytFeed.Entries[i].PubTime, err = time.Parse(time.RFC3339, entry.Pub)
+	// Get all entries.
+	entries := make([]schema.Entry, 0)
+	for _, e := range ytFeed.Entries {
+		t, err := time.Parse(time.RFC3339, e.Pub)
 		if err != nil {
-			return *ytFeed, err
+			return nil, err
 		}
+		entry := schema.Entry{e.Id, e.Title, t, e.Link.Url}
+		entries = append(entries, entry)
 	}
-	return *ytFeed, nil
+	return entries, nil
 }
