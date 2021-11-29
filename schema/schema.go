@@ -17,6 +17,7 @@ type NPRLink struct {
 type NPREntry struct {
 	XMLName xml.Name `xml:"item"`
 	Id      string   `xml:"guid"`
+	Title   string   `xml:"title"`
 	Pub     string   `xml:"pubDate"` // RFC1123Z
 	PubTime time.Time
 	Link    NPRLink `xml:"link"`
