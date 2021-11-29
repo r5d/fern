@@ -7,7 +7,8 @@ fern: fmt
 	go build
 
 fmt:
-	go fmt ${MOD} ${MOD}/config ${MOD}/file ${MOD}/schema
+	go fmt ${MOD} ${MOD}/config ${MOD}/db ${MOD}/feed \
+		${MOD}/file ${MOD}/schema ${MOD}/state
 
 test:
 	go test -v ${MOD}/db
