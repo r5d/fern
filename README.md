@@ -4,12 +4,20 @@ Media feed downloader.
 
 Depends on `youtube-dl` to download the media from the feed.
 
-## building
+## installing
 
-requires `make` and `go >= 1.15`
+Requires `make` and `go >= 1.15`
 
-to build it, just do:
+Install it with:
+
+```bash
+go get ricketyspace.net/fern
+```
+
+Or
 
 ```
-make
+go install ricketyspace.net/fern@latest
 ```
+
+if using `go >= 1.17`.
