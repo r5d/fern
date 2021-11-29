@@ -12,8 +12,9 @@ type FeedResult struct {
 
 // Contains the result of processing an Entry.
 type EntryResult struct {
-	EntryId string // Entry's identifier
-	Err     error  // Set on error
+	EntryId    string // Entry's identifier
+	EntryTitle string // Entry's title
+	Err        error  // Set on error
 }
 
 type ProcessState struct {
