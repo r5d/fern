@@ -19,6 +19,7 @@ type Feed struct {
 	Id      string `json:"id"`
 	Source  string `json:"source"`
 	Schema  string `json:"schema"`
+	Last    uint `json:"last"`
 	YDLPath string
 	DumpDir string
 	Entries []schema.Entry
@@ -54,6 +55,11 @@ func (feed *Feed) Validate(ydlPath, baseDumpDir string) error {
 	if !schemaOK {
 		return fmt.Errorf("schema '%s' for feed '%s' is not valid",
 			feed.Schema, feed.Id)
+	}
+
+	// Check 'last'
+	if feed.Last < 1 {
+		return fmt.Errorf("'last' not set or 0 in a feed '%s'", feed.Id)
 	}
 
 	// Set ydl-path for feed.
