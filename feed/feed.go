@@ -9,6 +9,7 @@ import (
 	"io"
 	"net/http"
 	"os"
+	"os/exec"
 	"path"
 	"time"
 
@@ -170,9 +171,38 @@ func (feed *Feed) processEntry(entry schema.Entry, erc chan state.EntryResult) {
 	// Init EntryResult.
 	er := state.EntryResult{entry.Id, entry.Title, nil}
 
-	// TODO: Download Entry
-
+	// Download entry.
+	err := feed.ydl(entry.Link)
+	if err != nil {
+		er.Err = err
+	}
 	erc <- er
+}
+
+func (feed *Feed) ydl(url string) error {
+	if len(url) == 0 {
+		return fmt.Errorf("URL invalid")
+	}
+
+	// Change working directory to feed's dumpdir.
+	wd, err := os.Getwd()
+	if err != nil {
+		return err
+	}
+	defer os.Chdir(wd)
+	err = os.Chdir(feed.DumpDir)
+	if err != nil {
+		return err
+	}
+
+	// Download url via youtube-dl
+	cmd := exec.Command(feed.YDLPath, "--no-progress", url)
+	out, err := cmd.CombinedOutput()
+	fmt.Printf("[%s]: %s", feed.Id, out)
+	if err != nil {
+		return err
+	}
+	return nil
 }
 
 // Unmarshal raw feed into an object.
