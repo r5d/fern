@@ -37,6 +37,7 @@ type YouTubeLink struct {
 type YouTubeEntry struct {
 	XMLName xml.Name `xml:"entry"`
 	Id      string   `xml:"id"`
+	Title   string   `xml:"group>title"`
 	Pub     string   `xml:"published"` // RFC3339
 	PubTime time.Time
 	Link    YouTubeLink `xml:"group>content"`
