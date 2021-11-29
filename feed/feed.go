@@ -192,19 +192,10 @@ func (feed *Feed) ydl(url string) error {
 		return fmt.Errorf("URL invalid")
 	}
 
-	// Change working directory to feed's dumpdir.
-	wd, err := os.Getwd()
-	if err != nil {
-		return err
-	}
-	defer os.Chdir(wd)
-	err = os.Chdir(feed.DumpDir)
-	if err != nil {
-		return err
-	}
-
 	// Download url via youtube-dl
-	cmd := exec.Command(feed.YDLPath, "--no-progress", url)
+	outputTemplate := fmt.Sprintf("-o%s",
+		path.Join(feed.DumpDir, "%(title)s-%(id)s.%(ext)s"))
+	cmd := exec.Command(feed.YDLPath, "--no-progress", outputTemplate, url)
 	out, err := cmd.CombinedOutput()
 	fmt.Printf("[%s]: %s", feed.Id, out)
 	if err != nil {
