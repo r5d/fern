@@ -5,8 +5,9 @@ package state
 
 // Contains the result of processing a Feed.
 type FeedResult struct {
-	FeedId string // Feed's identifier
-	Err    error  // Set on error
+	FeedId     string // Feed's identifier
+	FeedResult string // Feed result
+	Err        error  // Set on error
 }
 
 // Contains the result of processing an Entry.
