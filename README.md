@@ -1,6 +1,8 @@
 # fern
 
-Media feed downloader. Work in progress.
+Media feed downloader.
+
+Depends on `youtube-dl` to download the media from the feed.
 
 ## building
 
