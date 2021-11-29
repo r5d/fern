@@ -19,7 +19,7 @@ type Feed struct {
 	Id      string `json:"id"`
 	Source  string `json:"source"`
 	Schema  string `json:"schema"`
-	Last    uint `json:"last"`
+	Last    int    `json:"last"`
 	YDLPath string
 	DumpDir string
 	Entries []schema.Entry
