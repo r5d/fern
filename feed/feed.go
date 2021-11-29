@@ -126,13 +126,14 @@ func (feed *Feed) Process(pState *state.ProcessState) {
 	// Channel for receiving entry results.
 	erChan := make(chan state.EntryResult)
 	for i, entry := range feed.Entries {
+		e := entry
 		// Process entry only if it was not downloaded before.
-		if !pState.DB.Exists(feed.Id, entry.Id) {
-			go feed.processEntry(entry, erChan)
+		if !pState.DB.Exists(feed.Id, e.Id) {
+			go feed.processEntry(e, erChan)
 			processing += 1
 		} else {
 			fmt.Printf("[%s][%s]: Already downloaded '%s' before\n",
-				feed.Id, entry.Id, entry.Title)
+				feed.Id, e.Id, e.Title)
 		}
 
 		// Process only `feed.Last` entries.
