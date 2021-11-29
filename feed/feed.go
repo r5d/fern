@@ -13,6 +13,7 @@ import (
 	"time"
 
 	"ricketyspace.net/fern/schema"
+	"ricketyspace.net/fern/state"
 )
 
 type Feed struct {
@@ -100,6 +101,85 @@ func (feed *Feed) get() ([]byte, error) {
 	return bs, nil
 }
 
+// Processes the feed.
+func (feed *Feed) Process(pState *state.ProcessState) {
+	// Init FeedResult.
+	fr := state.FeedResult{feed.Id, "", nil}
+
+	// Get raw feed.
+	bs, err := feed.get()
+	if err != nil {
+		fr.Err = err
+		fr.FeedResult = "Unable to get feed"
+		pState.FeedResultChan <- fr
+		return
+	}
+
+	// Unmarshal raw feed into Feed.Object
+	err = feed.unmarshal(bs)
+	if err != nil {
+		fr.Err = err
+		fr.FeedResult = "Unable to parse feed"
+		pState.FeedResultChan <- fr
+		return
+	}
+
+	//
+	// Process entries.
+	//
+	// Number entries being processed.
+	errors := 0
+	processing := 0
+	// Channel for receiving entry results.
+	erChan := make(chan state.EntryResult)
+	for i, entry := range feed.Entries {
+		// Process entry only if it was not downloaded before.
+		if !pState.DB.Exists(feed.Id, entry.Id) {
+			go feed.processEntry(entry, erChan)
+			processing += 1
+		} else {
+			fmt.Printf("[%s][%s]: Already downloaded '%s' before\n",
+				feed.Id, entry.Id, entry.Title)
+		}
+
+		// Process only `feed.Last` entries.
+		if i >= feed.Last-1 {
+			break
+		}
+	}
+	// Wait for all entries to finish processing.
+	for processing > 0 {
+		er := <-erChan
+		if er.Err == nil {
+			fmt.Printf("[%s][%s]: Downloaded '%s'\n",
+				feed.Id, er.EntryId, er.EntryTitle)
+			// Log entry in db.
+			pState.DB.Add(feed.Id, er.EntryId)
+		} else {
+			fmt.Printf("[%s][%s]: Failed to download '%s': %v\n",
+				feed.Id, er.EntryId, er.EntryTitle,
+				er.Err.Error())
+			errors += 1
+		}
+		processing -= 1
+	}
+	if errors == 0 {
+		fr.FeedResult = "Processed feed"
+	} else {
+		fr.FeedResult = "Processed feed. One or more" +
+			" entries failed to download"
+	}
+	pState.FeedResultChan <- fr
+}
+
+func (feed *Feed) processEntry(entry schema.Entry, erc chan state.EntryResult) {
+	// Init EntryResult.
+	er := state.EntryResult{entry.Id, entry.Title, nil}
+
+	// TODO: Download Entry
+
+	erc <- er
+}
 
 // Unmarshal raw feed into an object.
 func (feed *Feed) unmarshal(bs []byte) error {
