@@ -8,6 +8,13 @@ import (
 	"time"
 )
 
+type Entry struct {
+	Id      string
+	Title   string
+	PubTime time.Time
+	Link    string
+}
+
 // NPR Feed Schema
 type NPRLink struct {
 	XMLName xml.Name `xml:"link"`
