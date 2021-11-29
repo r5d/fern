@@ -102,7 +102,7 @@ func (fdb *FernDB) Write() error {
 		return fmt.Errorf("FernDB path not set")
 	}
 
-	f, err := os.OpenFile(dbPath, os.O_WRONLY|os.O_CREATE, 0644)
+	f, err := os.OpenFile(dbPath, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0644)
 	if err != nil {
 		return err
 	}
