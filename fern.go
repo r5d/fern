@@ -25,8 +25,6 @@ func init() {
 	}
 
 	pState = state.NewProcessState()
-	pState.YDLPath = fConf.YDLPath
-	pState.DumpDir = fConf.DumpDir
 
 	// Open database.
 	pState.DB, err = db.Open()

@@ -20,8 +20,6 @@ type EntryResult struct {
 }
 
 type ProcessState struct {
-	YDLPath string
-	DumpDir string
 	DB      *db.FernDB
 	// Channel for Feed.Process goroutines to communicate to the
 	// caller about the number of entries that are being
