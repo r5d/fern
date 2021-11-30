@@ -20,7 +20,8 @@ type EntryResult struct {
 }
 
 type ProcessState struct {
-	DB      *db.FernDB
+	// Tracks entries that have already been downloaded.
+	DB *db.FernDB
 	// Channel for Feed.Process goroutines to communicate to the
 	// caller about the number of entries that are being
 	// downloaded for a feed.
