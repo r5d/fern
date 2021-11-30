@@ -25,8 +25,6 @@ type ProcessState struct {
 	// caller about the number of entries that are being
 	// downloaded for a feed.
 	FeedResultChan chan FeedResult
-	// Number of feeds that are being processed.
-	FeedsProcessing int
 }
 
 func NewProcessState() *ProcessState {

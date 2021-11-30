@@ -38,19 +38,20 @@ func main() {
 	defer pState.DB.Write() // Write database to disk before returning.
 
 	// Process all feeds.
+	processing := 0
 	for _, feed := range fConf.Feeds {
 		f := feed
 		go f.Process(pState)
-		pState.FeedsProcessing += 1
+		processing += 1
 	}
 	// Wait for all feeds finish processing.
-	for pState.FeedsProcessing > 0 {
+	for processing > 0 {
 		fTxt := "feeds"
-		if pState.FeedsProcessing == 1 {
+		if processing == 1 {
 			fTxt = "feed"
 		}
 		fmt.Printf("Waiting for %d %s to finish processing\n",
-			pState.FeedsProcessing, fTxt)
+			processing, fTxt)
 		fr := <-pState.FeedResultChan
 		if fr.Err == nil {
 			fmt.Printf("[%s]: %s\n",
@@ -59,6 +60,6 @@ func main() {
 			fmt.Printf("[%s]: %s: %v\n",
 				fr.FeedId, fr.FeedResult, fr.Err.Error())
 		}
-		pState.FeedsProcessing -= 1
+		processing -= 1
 	}
 }
