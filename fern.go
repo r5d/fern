@@ -18,12 +18,14 @@ var pState *state.ProcessState
 func init() {
 	var err error
 
+	// Get fern config.
 	fConf, err = config.Read()
 	if err != nil {
 		fmt.Printf("Error: %v\n", err.Error())
 		os.Exit(1)
 	}
 
+	// Initialize process  state.
 	pState = state.NewProcessState()
 
 	// Open database.
