@@ -21,7 +21,7 @@
 //        "feeds": [...] // list of media feeds.
 //     }
 //
-//  Each item in the media "feeds" must be:
+// Each item in the media "feeds" must be:
 //
 //     {
 //        "id": "media-feed-id", // uniquid identifier for the media feed
