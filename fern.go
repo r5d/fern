@@ -24,9 +24,9 @@
 // Each item in the media "feeds" must be:
 //
 //     {
-//        "id": "media-feed-id", // uniquid identifier for the media feed
+//        "id": "media-feed-id", // unique identifier for the media feed
 //        "source": "https://feeds.npr.org/XXXX/rss.xml", // media feed url
-//        "schema": "npr", // should be "youtube" or "npr"
+//        "schema": "npr", // must be "youtube" or "npr"
 //        "last": 5 // The last N items that should be downloaded
 //     }
 //
