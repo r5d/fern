@@ -14,12 +14,18 @@ import (
 	"ricketyspace.net/fern/file"
 )
 
+// Represents the fern config
 type FernConfig struct {
-	YDLPath string      `json:"ydl-path"`
-	DumpDir string      `json:"dump-dir"`
-	Feeds   []feed.Feed `json:"feeds"`
+	YDLPath string      `json:"ydl-path"` // Path to the youtube-dl program.
+	DumpDir string      `json:"dump-dir"` // Path where media needs to be downloaded to.
+	Feeds   []feed.Feed `json:"feeds"`    // Feeds to download.
 }
 
+// Tries to reads the fern config at `$HOME/.config/fern/fern.json`
+// and unmarshals it into `FernConfig`
+//
+// Returns point to `FernConfig` on success. On error, the returned
+// config is `nil` and the returned error is non-nil.
 func Read() (*FernConfig, error) {
 	// Construct config file path.
 	h, err := os.UserHomeDir()
@@ -55,6 +61,9 @@ func Read() (*FernConfig, error) {
 	return config, nil
 }
 
+// Validates the FernConfig.
+//
+// Returns nil if validation succeeds; error otherwise.
 func (config *FernConfig) validate() error {
 	// Validate 'ydl-path' in config.
 	if len(config.YDLPath) == 0 {
