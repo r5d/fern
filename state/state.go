@@ -19,6 +19,8 @@ type EntryResult struct {
 	Err        error  // Set on error
 }
 
+// Paraphernalia passed and shared between go routines that process
+// the feeds.
 type ProcessState struct {
 	// Tracks entries that have already been downloaded.
 	DB *db.FernDB
@@ -28,6 +30,7 @@ type ProcessState struct {
 	FeedResultChan chan FeedResult
 }
 
+// Creates an instance of ProcessState and returns a pointer to it.
 func NewProcessState() *ProcessState {
 	ps := new(ProcessState)
 	ps.FeedResultChan = make(chan FeedResult)
