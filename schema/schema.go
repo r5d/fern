@@ -8,6 +8,7 @@ import (
 	"time"
 )
 
+// Generic entry.
 type Entry struct {
 	Id      string
 	Title   string
@@ -15,12 +16,13 @@ type Entry struct {
 	Link    string
 }
 
-// NPR Feed Schema
+// Represents a NPR media link.
 type NPRLink struct {
 	XMLName xml.Name `xml:"link"`
 	Url     string   `xml:",chardata"`
 }
 
+// Represents an entry in the NPR feed.
 type NPREntry struct {
 	XMLName xml.Name `xml:"item"`
 	Id      string   `xml:"guid"`
@@ -30,17 +32,19 @@ type NPREntry struct {
 	Link    NPRLink `xml:"link"`
 }
 
+// Represents a NPR Feed.
 type NPRFeed struct {
 	XMLName xml.Name   `xml:"rss"`
 	Entries []NPREntry `xml:"channel>item"`
 }
 
-// YouTube Feed Schema
+// Represents the link a YouTube video.
 type YouTubeLink struct {
 	XMLName xml.Name `xml:"content"`
 	Url     string   `xml:"url,attr"`
 }
 
+// Represents an entry in the YouTube feed.
 type YouTubeEntry struct {
 	XMLName xml.Name `xml:"entry"`
 	Id      string   `xml:"id"`
@@ -50,6 +54,7 @@ type YouTubeEntry struct {
 	Link    YouTubeLink `xml:"group>content"`
 }
 
+// Represents a YouTube feed.
 type YouTubeFeed struct {
 	XMLName xml.Name       `xml:"feed"`
 	Entries []YouTubeEntry `xml:"entry"`
