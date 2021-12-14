@@ -15,6 +15,10 @@ import (
 
 var dbPath string
 
+// Contains information about list of media that where already
+// download for different feeds.
+//
+// It's stored on disk as a JSON at `$HOME/.config/fern/db.json
 type FernDB struct {
 	mutex *sync.Mutex // For writes to `downloaded`
 	// Key: feed-id
@@ -34,6 +38,11 @@ func init() {
 
 }
 
+// Reads the fern db from disk and unmarshals it into a FernDB
+// instance.
+//
+// Returns a pointer to FernDB on success; nil otherwise. The second
+// return value is non-nil on error.
 func Open() (*FernDB, error) {
 	if len(dbPath) == 0 {
 		return nil, fmt.Errorf("FernDB path not set")
@@ -69,6 +78,8 @@ func Open() (*FernDB, error) {
 	return db, nil
 }
 
+// Returns true if an `entry` for `feed` exists in the database; false
+// otherwise.
 func (fdb *FernDB) Exists(feed, entry string) bool {
 	if _, ok := fdb.downloaded[feed]; !ok {
 		return false
@@ -82,6 +93,11 @@ func (fdb *FernDB) Exists(feed, entry string) bool {
 
 }
 
+// Adds `feed` <-> `entry` to the database.
+//
+// Once a `feed` <-> `entry` is added to the database, fern assumes
+// that entry was downloaded and will not try downloading the entry
+// again.
 func (fdb *FernDB) Add(feed, entry string) {
 	// Check if entry already exist for feed.
 	if fdb.Exists(feed, entry) {
@@ -97,6 +113,9 @@ func (fdb *FernDB) Add(feed, entry string) {
 	fdb.mutex.Unlock()
 }
 
+// Writes FernDB to disk in the JSON format.
+//
+// Returns nil on success; error otherwise
 func (fdb *FernDB) Write() error {
 	if len(dbPath) == 0 {
 		return fmt.Errorf("FernDB path not set")
