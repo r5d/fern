@@ -41,6 +41,10 @@
 // To print fern's version, do:
 //
 //    $ fern -version
+//
+// Contact
+//
+// Email bug reports, questions, patches, etc to `s@rickteyspace.net`.
 package main
 
 import (
@@ -53,7 +57,7 @@ import (
 	"ricketyspace.net/fern/state"
 )
 
-const version = "0.4.0"
+const version = "0.4.1"
 
 var fConf *config.FernConfig
 var pState *state.ProcessState
