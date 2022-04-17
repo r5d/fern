@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: ISC
-// Copyright © 2021 siddharth <s@ricketyspace.net>
+// Copyright © 2022 siddharth <s@ricketyspace.net>
 
 // fern is a simple media feed downloader.
 //
@@ -27,7 +27,8 @@
 //        "id": "media-feed-id", // unique identifier for the media feed
 //        "source": "https://feeds.npr.org/XXXX/rss.xml", // media feed url
 //        "schema": "npr", // must be "youtube" or "npr"
-//        "last": 5 // The last N items that should be downloaded
+//        "last": 5 // the last N items that should be downloaded
+//        "title-contains": "tiny desk" // optional. if specified, downloads entries with title matching the value of this field
 //     }
 //
 // You may download an example config file for fern from
@@ -52,7 +53,7 @@ import (
 	"ricketyspace.net/fern/state"
 )
 
-const version = "0.3.0"
+const version = "0.4.0.dev"
 
 var fConf *config.FernConfig
 var pState *state.ProcessState
