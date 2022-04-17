@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: ISC
-// Copyright © 2021 siddharth <s@ricketyspace.net>
+// Copyright © 2022 siddharth <s@ricketyspace.net>
 
 package feed
 
@@ -18,13 +18,14 @@ import (
 )
 
 type Feed struct {
-	Id      string `json:"id"`
-	Source  string `json:"source"`
-	Schema  string `json:"schema"`
-	Last    int    `json:"last"`
-	YDLPath string
-	DumpDir string
-	Entries []schema.Entry
+	Id            string
+	Source        string
+	Schema        string
+	Last          int
+	TitleContains string `json:"title-contains"`
+	YDLPath       string
+	DumpDir       string
+	Entries       []schema.Entry
 }
 
 func (feed *Feed) Validate(baseDumpDir string) error {
@@ -124,10 +125,21 @@ func (feed *Feed) Process(pState *state.ProcessState) {
 	// Number entries being processed.
 	errors := 0
 	processing := 0
+	traversed := 0
 	// Channel for receiving entry results.
 	erChan := make(chan state.EntryResult)
-	for i, entry := range feed.Entries {
+	for _, entry := range feed.Entries {
 		e := entry
+
+		// Ignore entry if its title does not matches
+		// feed's 'title-contains' string.
+		if len(feed.TitleContains) > 0 &&
+			!e.TitleContains(feed.TitleContains) {
+			fmt.Printf("[%s][%s]: Skipping '%s'\n",
+				feed.Id, e.Id, e.Title)
+			continue
+		}
+
 		// Process entry only if it was not downloaded before.
 		if !pState.DB.Exists(feed.Id, e.Id) {
 			go feed.processEntry(e, erChan)
@@ -136,9 +148,10 @@ func (feed *Feed) Process(pState *state.ProcessState) {
 			fmt.Printf("[%s][%s]: Already downloaded '%s' before\n",
 				feed.Id, e.Id, e.Title)
 		}
+		traversed += 1
 
 		// Process only `feed.Last` entries.
-		if i >= feed.Last-1 {
+		if traversed >= feed.Last-1 {
 			break
 		}
 	}
