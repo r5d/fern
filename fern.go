@@ -33,13 +33,17 @@
 // You may download an example config file for fern from
 // https://ricketyspace.net/fern/fern.json
 //
-// fern does not take any arguments, to run it just do:
+// Run fern with:
 //
-//    $ fern
+//    $ fern -run
 //
+// To print fern's version, do:
+//
+//    $ fern -version
 package main
 
 import (
+	"flag"
 	"fmt"
 	"os"
 
@@ -48,8 +52,13 @@ import (
 	"ricketyspace.net/fern/state"
 )
 
+const version = "0.3.0"
+
 var fConf *config.FernConfig
 var pState *state.ProcessState
+
+var vFlag *bool
+var rFlag *bool
 
 func init() {
 	var err error
@@ -70,6 +79,25 @@ func init() {
 		fmt.Printf("Error: %v\n", err.Error())
 		os.Exit(1)
 	}
+
+	// Parse args.
+	vFlag = flag.Bool("version", false, "Print version")
+	rFlag = flag.Bool("run", false, "Run fern")
+	flag.Parse()
+
+	if *vFlag {
+		fmt.Printf("%s\n", version)
+		os.Exit(0)
+	}
+	if !*rFlag {
+		printUsage(2)
+	}
+}
+
+func printUsage(exit int) {
+	fmt.Printf("fern [ -run | -version ]\n")
+	flag.PrintDefaults()
+	os.Exit(exit)
 }
 
 func main() {
