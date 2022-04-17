@@ -196,8 +196,7 @@ func (feed *Feed) ydl(url string) error {
 	outputTemplate := fmt.Sprintf("-o%s",
 		path.Join(feed.DumpDir, "%(title)s-%(id)s.%(ext)s"))
 	cmd := exec.Command(feed.YDLPath, "--no-progress", outputTemplate, url)
-	out, err := cmd.CombinedOutput()
-	fmt.Printf("[%s]: %s", feed.Id, out)
+	_, err := cmd.CombinedOutput()
 	if err != nil {
 		return err
 	}
