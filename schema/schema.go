@@ -1,10 +1,11 @@
 // SPDX-License-Identifier: ISC
-// Copyright © 2021 siddharth <s@ricketyspace.net>
+// Copyright © 2022 siddharth <s@ricketyspace.net>
 
 package schema
 
 import (
 	"encoding/xml"
+	"strings"
 	"time"
 )
 
@@ -58,4 +59,8 @@ type YouTubeEntry struct {
 type YouTubeFeed struct {
 	XMLName xml.Name       `xml:"feed"`
 	Entries []YouTubeEntry `xml:"entry"`
+}
+
+func (e Entry) TitleContains(contains string) bool {
+	return strings.Contains(strings.ToLower(e.Title), strings.ToLower(contains))
 }
