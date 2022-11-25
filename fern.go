@@ -15,32 +15,32 @@
 //
 // fern's config file contains three fields:
 //
-//     {
-//        "ydl-path": "/usr/local/bin/yt-dlp",
-//        "dump-dir": "~/media/feeds", // media feed download directory
-//        "feeds": [...] // list of media feeds.
-//     }
+//	{
+//	   "ydl-path": "/usr/local/bin/yt-dlp",
+//	   "dump-dir": "~/media/feeds", // media feed download directory
+//	   "feeds": [...] // list of media feeds.
+//	}
 //
 // Each item in the media "feeds" must be:
 //
-//     {
-//        "id": "media-feed-id", // unique identifier for the media feed
-//        "source": "https://feeds.npr.org/XXXX/rss.xml", // media feed url
-//        "schema": "npr", // must be "youtube" or "npr"
-//        "last": 5 // the last N items that should be downloaded
-//        "title-contains": "tiny desk" // optional. if specified, downloads entries with title matching the value of this field
-//     }
+//	{
+//	   "id": "media-feed-id", // unique identifier for the media feed
+//	   "source": "https://feeds.npr.org/XXXX/rss.xml", // media feed url
+//	   "schema": "npr", // must be "youtube" or "npr"
+//	   "last": 5 // the last N items that should be downloaded
+//	   "title-contains": "tiny desk" // optional. if specified, downloads entries with title matching the value of this field
+//	}
 //
 // You may download an example config file for fern from
 // https://ricketyspace.net/fern/fern.json
 //
 // Run fern with:
 //
-//    $ fern -run
+//	$ fern -run
 //
 // To print fern's version, do:
 //
-//    $ fern -version
+//	$ fern -version
 package main
 
 import (
