@@ -155,7 +155,7 @@ func (feed *Feed) Process(pState *state.ProcessState) {
 		traversed += 1
 
 		// Process only `feed.Last` entries.
-		if traversed >= feed.Last-1 {
+		if traversed >= feed.Last {
 			break
 		}
 	}
