@@ -6,7 +6,7 @@
 // It depends on yt-dlp to download the media found in the media feeds
 // to your computer.
 //
-// fern currently supports YoutTube and NPR feeds.
+// fern currently supports YoutTube, NPR, and Podcast feeds.
 //
 // Information about what media feeds to download, the location of
 // yt-dlp program on your computer, and the directory where the media
@@ -26,7 +26,7 @@
 //	{
 //	   "id": "media-feed-id", // unique identifier for the media feed
 //	   "source": "https://feeds.npr.org/XXXX/rss.xml", // media feed url
-//	   "schema": "npr", // must be "youtube" or "npr"
+//	   "schema": "npr", // must be "youtube" or "npr" or "podcast"
 //	   "last": 5 // the last N items that should be downloaded
 //	   "title-contains": "tiny desk" // optional. if specified, downloads entries with title matching the value of this field
 //	}
