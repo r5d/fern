@@ -99,7 +99,11 @@ func (feed *Feed) get() ([]byte, error) {
 // Processes the feed.
 func (feed *Feed) Process(pState *state.ProcessState) {
 	// Init FeedResult.
-	fr := state.FeedResult{feed.Id, "", nil}
+	fr := state.FeedResult{
+		FeedId:     feed.Id,
+		FeedResult: "",
+		Err:        nil,
+	}
 
 	// Get raw feed.
 	bs, err := feed.get()
@@ -188,7 +192,11 @@ func (feed *Feed) Process(pState *state.ProcessState) {
 
 func (feed *Feed) processEntry(entry schema.Entry, erc chan state.EntryResult) {
 	// Init EntryResult.
-	er := state.EntryResult{entry.Id, entry.Title, nil}
+	er := state.EntryResult{
+		EntryId:    entry.Id,
+		EntryTitle: entry.Title,
+		Err:        nil,
+	}
 
 	// Download entry.
 	fmt.Printf("[%s][%s] Going to download %s\n", feed.Id,
@@ -253,7 +261,12 @@ func nprUnmarshal(bs []byte) ([]schema.Entry, error) {
 		if err != nil {
 			return nil, err
 		}
-		entry := schema.Entry{e.Id, e.Title, t, e.Link.Url}
+		entry := schema.Entry{
+			Id:      e.Id,
+			Title:   e.Title,
+			PubTime: t,
+			Link:    e.Link.Url,
+		}
 		entries = append(entries, entry)
 	}
 	return entries, nil
@@ -274,7 +287,12 @@ func youtubeUnmarshal(bs []byte) ([]schema.Entry, error) {
 		if err != nil {
 			return nil, err
 		}
-		entry := schema.Entry{e.Id, e.Title, t, e.Link.Url}
+		entry := schema.Entry{
+			Id:      e.Id,
+			Title:   e.Title,
+			PubTime: t,
+			Link:    e.Link.Url,
+		}
 		entries = append(entries, entry)
 	}
 	return entries, nil
