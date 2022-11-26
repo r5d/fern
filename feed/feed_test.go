@@ -49,3 +49,41 @@ func TestPodcastUnmarshal(t *testing.T) {
 		}
 	}
 }
+
+func TestUnmarshal(t *testing.T) {
+	testFeeds := map[string]string{
+		"podcast": "testdata/pc-daringfireball.xml",
+	}
+	for schema, feed := range testFeeds {
+		bs, err := file.ReadFile(feed)
+		if err != nil {
+			t.Errorf("read feed: %v", err)
+			return
+		}
+		feed := new(Feed)
+		feed.Schema = schema
+		if err = feed.unmarshal(bs); err != nil {
+			t.Errorf("feed unmarshal: %v", err)
+			return
+		}
+		for _, entry := range feed.Entries {
+			if len(entry.Id) < 1 {
+				t.Errorf("entry id: %v", entry.Id)
+				return
+			}
+			if len(entry.Title) < 1 {
+				t.Errorf("entry title: %v", entry.Title)
+				return
+			}
+			if entry.PubTime.Unix() < 994702392 {
+				t.Errorf("entry time: %v", entry.PubTime)
+				return
+			}
+			_, err = url.Parse(entry.Link)
+			if err != nil {
+				t.Errorf("entry link: %s: %v", entry.Link, err)
+				return
+			}
+		}
+	}
+}

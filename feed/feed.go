@@ -242,6 +242,12 @@ func (feed *Feed) unmarshal(bs []byte) error {
 			return err
 		}
 		return nil
+	case feed.Schema == "podcast":
+		feed.Entries, err = podcastUnmarshal(bs)
+		if err != nil {
+			return err
+		}
+		return nil
 	}
 	return fmt.Errorf("schema of feed '%s' unknown", feed.Id)
 }
