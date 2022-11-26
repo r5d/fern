@@ -16,5 +16,5 @@ vet:
 	go vet ./...
 
 test:
-	go test -v ${MOD}/db
+	go test -v ${MOD}/db ${MOD}/file ${MOD}/schema
 .PHONY: test
