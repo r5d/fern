@@ -297,3 +297,38 @@ func youtubeUnmarshal(bs []byte) ([]schema.Entry, error) {
 	}
 	return entries, nil
 }
+
+// Unmarshal a Podcast feed.
+func podcastUnmarshal(bs []byte) ([]schema.Entry, error) {
+	pcFeed := new(schema.PodcastFeed)
+	err := xml.Unmarshal(bs, pcFeed)
+	if err != nil {
+		return nil, err
+	}
+
+	// Get all entries.
+	entries := make([]schema.Entry, 0)
+	for _, e := range pcFeed.Entries {
+		layout := time.RFC1123Z
+		if e.Pub[len(e.Pub)-1:] == "T" {
+			// Textual time zone. like 'EDT'.
+			if e.Pub[6:7] == " " {
+				layout = "Mon, 2 Jan 2006 15:04:05 MST"
+			} else {
+				layout = time.RFC1123
+			}
+		}
+		t, err := time.Parse(layout, e.Pub)
+		if err != nil {
+			return nil, err
+		}
+		entry := schema.Entry{
+			Id:      e.Id,
+			Title:   e.Title,
+			PubTime: t,
+			Link:    e.Link.Url,
+		}
+		entries = append(entries, entry)
+	}
+	return entries, nil
+}
