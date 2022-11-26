@@ -3,11 +3,14 @@
 
 MOD=ricketyspace.net/fern
 
-fern: fmt
+fern: fmt fix
 	go build
 
 fmt:
 	go fmt ./...
+
+fix:
+	go fix ./...
 
 test:
 	go test -v ${MOD}/db
