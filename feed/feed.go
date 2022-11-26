@@ -46,7 +46,7 @@ func (feed *Feed) Validate(baseDumpDir string) error {
 
 	// Check 'schema'
 	schemaOK := false
-	for _, schema := range []string{"npr", "youtube"} {
+	for _, schema := range []string{"npr", "youtube", "podcast"} {
 		if feed.Schema == schema {
 			schemaOK = true
 		}
