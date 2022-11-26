@@ -61,6 +61,28 @@ type YouTubeFeed struct {
 	Entries []YouTubeEntry `xml:"entry"`
 }
 
+// Represents a direct link to a Podcast.
+type PodcastLink struct {
+	XMLName xml.Name `xml:"enclosure"`
+	Url     string   `xml:"url,attr"`
+}
+
+// Represents an entry in the Podcast feed.
+type PodcastEntry struct {
+	XMLName xml.Name `xml:"item"`
+	Id      string   `xml:"guid"`
+	Title   string   `xml:"title"`
+	Pub     string   `xml:"pubDate"`
+	PubTime time.Time
+	Link    PodcastLink `xml:"enclosure"`
+}
+
+// Represents a iTunes Podcast feed.
+type PodcastFeed struct {
+	XMLName xml.Name       `xml:"rss"`
+	Entries []PodcastEntry `xml:"channel>item"`
+}
+
 func (e Entry) TitleContains(contains string) bool {
 	return strings.Contains(strings.ToLower(e.Title), strings.ToLower(contains))
 }
