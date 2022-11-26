@@ -15,6 +15,7 @@ import (
 
 	"ricketyspace.net/fern/schema"
 	"ricketyspace.net/fern/state"
+	"ricketyspace.net/fern/version"
 )
 
 type Feed struct {
@@ -76,7 +77,13 @@ func (feed *Feed) get() ([]byte, error) {
 	// Init byte container to store feed content.
 	bs := make([]byte, 0)
 
-	resp, err := http.Get(feed.Source)
+	req, err := http.NewRequest("GET", feed.Source, nil)
+	if err != nil {
+		return bs, err
+	}
+	req.Header.Set("User-Agent", "fern/"+version.Version)
+	client := http.Client{}
+	resp, err := client.Do(req)
 	if err != nil {
 		return bs, err
 	}
