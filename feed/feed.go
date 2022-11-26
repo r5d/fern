@@ -199,7 +199,7 @@ func (feed *Feed) processEntry(entry schema.Entry, erc chan state.EntryResult) {
 	}
 
 	// Download entry.
-	fmt.Printf("[%s][%s] Going to download %s\n", feed.Id,
+	fmt.Printf("[%s][%s] Going to download '%s'\n", feed.Id,
 		entry.Id, entry.Title)
 	err := feed.ydl(entry.Link)
 	if err != nil {
