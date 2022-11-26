@@ -24,6 +24,16 @@ func Read(f *os.File) ([]byte, error) {
 	return bs, nil
 }
 
+func ReadFile(path string) ([]byte, error) {
+	f, err := os.Open(path)
+	if err != nil {
+		return []byte{}, err
+	}
+	defer f.Close()
+
+	return Read(f)
+}
+
 func Write(f *os.File, content []byte) error {
 	n, err := f.Write(content)
 	if n != len(content) {
