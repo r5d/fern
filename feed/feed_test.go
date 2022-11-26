@@ -12,10 +12,10 @@ import (
 
 func TestPodcastUnmarshal(t *testing.T) {
 	testFeeds := []string{
- 		"testdata/pc-atp.xml",
- 		"testdata/pc-daringfireball.xml",
- 		"testdata/pc-kara.xml",
- 		"testdata/pc-scwpod.xml",
+		"testdata/pc-atp.xml",
+		"testdata/pc-daringfireball.xml",
+		"testdata/pc-kara.xml",
+		"testdata/pc-scwpod.xml",
 	}
 	for _, feed := range testFeeds {
 		bs, err := file.ReadFile(feed)
