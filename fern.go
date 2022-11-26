@@ -51,9 +51,8 @@ import (
 	"ricketyspace.net/fern/config"
 	"ricketyspace.net/fern/db"
 	"ricketyspace.net/fern/state"
+	"ricketyspace.net/fern/version"
 )
-
-const version = "0.5.0.dev"
 
 var fConf *config.FernConfig
 var pState *state.ProcessState
@@ -87,7 +86,7 @@ func init() {
 	flag.Parse()
 
 	if *vFlag {
-		fmt.Printf("%s\n", version)
+		fmt.Printf("%s\n", version.Version)
 		os.Exit(0)
 	}
 	if !*rFlag {
