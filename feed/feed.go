@@ -11,6 +11,7 @@ import (
 	"os"
 	"os/exec"
 	"path"
+	"strings"
 	"time"
 
 	"ricketyspace.net/fern/schema"
@@ -220,9 +221,15 @@ func (feed *Feed) ydl(url string) error {
 		return fmt.Errorf("URL invalid")
 	}
 
+	// Media file name.
+	mediaName := "%(title)s-%(id)s.%(ext)s"
+	if strings.Contains(url, "buzzsprout.com") {
+		mediaName = path.Base(url)
+	}
+
 	// Download url via youtube-dl
 	outputTemplate := fmt.Sprintf("-o%s",
-		path.Join(feed.DumpDir, "%(title)s-%(id)s.%(ext)s"))
+		path.Join(feed.DumpDir, mediaName))
 	cmd := exec.Command(feed.YDLPath, "--no-progress", outputTemplate, url)
 	_, err := cmd.CombinedOutput()
 	if err != nil {
