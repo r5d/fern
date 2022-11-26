@@ -53,7 +53,7 @@ import (
 	"ricketyspace.net/fern/state"
 )
 
-const version = "0.4.3"
+const version = "0.5.0.dev"
 
 var fConf *config.FernConfig
 var pState *state.ProcessState
