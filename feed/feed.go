@@ -30,6 +30,19 @@ type Feed struct {
 	Entries       []schema.Entry
 }
 
+var specialCharReplacer = strings.NewReplacer(
+	"'", "",
+	"’", "",
+	"(", "",
+	")", "",
+	"[", "",
+	"]", "",
+	":", "",
+	"/", "",
+	"?", "",
+	" ", "_",
+)
+
 func (feed *Feed) Validate(baseDumpDir string) error {
 	_, err := os.Stat(baseDumpDir)
 	if err != nil {
@@ -209,28 +222,34 @@ func (feed *Feed) processEntry(entry schema.Entry, erc chan state.EntryResult) {
 	// Download entry.
 	fmt.Printf("[%s][%s] Going to download '%s'\n", feed.Id,
 		entry.Id, entry.Title)
-	err := feed.ydl(entry.Link)
+	err := feed.ydl(entry)
 	if err != nil {
 		er.Err = err
 	}
 	erc <- er
 }
 
-func (feed *Feed) ydl(url string) error {
-	if len(url) == 0 {
+func (feed *Feed) ydl(entry schema.Entry) error {
+	if len(entry.Link) == 0 {
 		return fmt.Errorf("URL invalid")
 	}
 
 	// Media file name.
 	mediaName := "%(title)s-%(id)s.%(ext)s"
-	if strings.Contains(url, "buzzsprout.com") {
-		mediaName = path.Base(url)
+	switch {
+	case strings.Contains(entry.Link, "buzzsprout.com"):
+		mediaName = path.Base(entry.Link)
+	case strings.Contains(entry.Link, "megaphone.fm"):
+		mediaName = fmt.Sprintf(
+			"%s-%%(id)s.%%(ext)s",
+			specialCharReplacer.Replace(entry.Title),
+		)
 	}
 
 	// Download url via youtube-dl
 	outputTemplate := fmt.Sprintf("-o%s",
 		path.Join(feed.DumpDir, mediaName))
-	cmd := exec.Command(feed.YDLPath, "--no-progress", outputTemplate, url)
+	cmd := exec.Command(feed.YDLPath, "--no-progress", outputTemplate, entry.Link)
 	_, err := cmd.CombinedOutput()
 	if err != nil {
 		return err
