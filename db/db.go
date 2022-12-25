@@ -14,6 +14,7 @@ import (
 )
 
 var dbPath string
+var defaultDBPath string
 
 // Contains information about list of media that where already
 // download for different feeds.
@@ -34,8 +35,8 @@ func init() {
 	if err != nil {
 		return
 	}
-	dbPath = path.Join(h, ".config", "fern", "db.json")
-
+	defaultDBPath = path.Join(h, ".config", "fern", "db.json")
+	dbPath = defaultDBPath
 }
 
 // Reads the fern db from disk and unmarshals it into a FernDB
@@ -139,4 +140,10 @@ func (fdb *FernDB) Write() error {
 		return err
 	}
 	return nil
+}
+
+// Sets DB path to the default path. This function is meant to be used
+// by tests.
+func resetDBPath() {
+	dbPath = defaultDBPath
 }
