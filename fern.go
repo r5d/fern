@@ -46,7 +46,12 @@ package main
 import (
 	"flag"
 	"fmt"
+	"log"
 	"os"
+	"path"
+	"runtime"
+	"runtime/pprof"
+	"time"
 
 	"ricketyspace.net/fern/config"
 	"ricketyspace.net/fern/db"
@@ -59,6 +64,8 @@ var pState *state.ProcessState
 
 var vFlag *bool
 var rFlag *bool
+var pFlag *string
+var profileSuffix string
 
 func init() {
 	var err error
@@ -83,6 +90,8 @@ func init() {
 	// Parse args.
 	vFlag = flag.Bool("version", false, "Print version")
 	rFlag = flag.Bool("run", false, "Run fern")
+	pFlag = flag.String("prof", "",
+		"Write cpu and memory profiles to the specified directory")
 	flag.Parse()
 
 	if *vFlag {
@@ -92,16 +101,54 @@ func init() {
 	if !*rFlag {
 		printUsage(2)
 	}
+	if *pFlag != "" {
+		profileSuffix = fmt.Sprintf("%d.prof", time.Now().UnixMilli())
+	}
+
+	// Setup logger.
+	log.SetFlags(0)
 }
 
 func printUsage(exit int) {
-	fmt.Printf("fern [ -run | -version ]\n")
+	fmt.Printf("fern [ -run [ -prof DIR ] | -version ]\n")
 	flag.PrintDefaults()
 	os.Exit(exit)
 }
 
 func main() {
-	defer pState.DB.Write() // Write database to disk before returning.
+	// Setup CPU and memory profiling if enabled.
+	if *pFlag != "" {
+		// CPU profiling.
+		cn := path.Join(*pFlag, "cpu."+profileSuffix)
+		cf, err := os.Create(cn)
+		if err != nil {
+			log.Fatal("could not create CPU profile: ", err)
+		}
+		defer cf.Close()
+		if err := pprof.StartCPUProfile(cf); err != nil {
+			log.Fatal("could not start CPU profile: ", err)
+		}
+		defer pprof.StopCPUProfile()
+
+		// Memory profiling.
+		mn := path.Join(*pFlag, "mem."+profileSuffix)
+		mf, err := os.Create(mn)
+		if err != nil {
+			log.Fatal("could not create memory profile: ", err)
+		}
+		defer mf.Close()
+		defer func() {
+			runtime.GC()
+			if err := pprof.WriteHeapProfile(mf); err != nil {
+				log.Fatal("could not write memory profile: ", err)
+			}
+		}()
+		log.Printf("Profiling enabled. CPU and memory profiles"+
+			" will be written to %s and %s", cn, mn)
+	}
+
+	// Write database to disk before returning.
+	defer pState.DB.Write()
 
 	// Process all feeds.
 	processing := 0
