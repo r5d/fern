@@ -21,7 +21,8 @@ var defaultDBPath string
 //
 // It's stored on disk as a JSON at `$HOME/.config/fern/db.json
 type FernDB struct {
-	mutex *sync.Mutex // For writes to `downloaded`
+	// For locking concurrent read/write access downloaded.
+	mutex *sync.RWMutex
 	// Key: feed-id
 	// Value: feed-id's entries that were downloaded
 	downloaded map[string][]string
@@ -54,7 +55,7 @@ func Open() (*FernDB, error) {
 	if err != nil {
 		// db does not exist yet; create an empty one.
 		db := new(FernDB)
-		db.mutex = new(sync.Mutex)
+		db.mutex = new(sync.RWMutex)
 		db.downloaded = make(map[string][]string)
 		return db, nil
 	}
@@ -71,7 +72,7 @@ func Open() (*FernDB, error) {
 
 	// Unmarshal db into an object.
 	db := new(FernDB)
-	db.mutex = new(sync.Mutex)
+	db.mutex = new(sync.RWMutex)
 	err = json.Unmarshal(bs, &db.downloaded)
 	if err != nil {
 		return nil, err
@@ -79,9 +80,10 @@ func Open() (*FernDB, error) {
 	return db, nil
 }
 
-// Returns true if an `entry` for `feed` exists in the database; false
-// otherwise.
-func (fdb *FernDB) Exists(feed, entry string) bool {
+// Checks if entry exists in feed. Assumes the current go routine
+// already has the mutex lock. Meant for use by the Exists and Add
+// methods.
+func (fdb *FernDB) exists(feed, entry string) bool {
 	if _, ok := fdb.downloaded[feed]; !ok {
 		return false
 	}
@@ -91,7 +93,16 @@ func (fdb *FernDB) Exists(feed, entry string) bool {
 		}
 	}
 	return false
+}
 
+// Returns true if an `entry` for `feed` exists in the database; false
+// otherwise.
+func (fdb *FernDB) Exists(feed, entry string) bool {
+	// Acquire read lock.
+	fdb.mutex.RLock()
+	defer fdb.mutex.RUnlock() // Give up lock before returning.
+
+	return fdb.exists(feed, entry)
 }
 
 // Adds `feed` <-> `entry` to the database.
@@ -100,24 +111,31 @@ func (fdb *FernDB) Exists(feed, entry string) bool {
 // that entry was downloaded and will not try downloading the entry
 // again.
 func (fdb *FernDB) Add(feed, entry string) {
+	// Acquire write lock.
+	fdb.mutex.Lock()
+	defer fdb.mutex.Unlock() // Give up lock before returning.
+
 	// Check if entry already exist for feed.
-	if fdb.Exists(feed, entry) {
+	if fdb.exists(feed, entry) {
 		return
 	}
 
 	// Add entry.
-	fdb.mutex.Lock()
 	if _, ok := fdb.downloaded[feed]; !ok {
 		fdb.downloaded[feed] = make([]string, 0)
 	}
 	fdb.downloaded[feed] = append(fdb.downloaded[feed], entry)
-	fdb.mutex.Unlock()
+
 }
 
 // Writes FernDB to disk in the JSON format.
 //
 // Returns nil on success; error otherwise
 func (fdb *FernDB) Write() error {
+	// Acquire write lock.
+	fdb.mutex.Lock()
+	defer fdb.mutex.Unlock() // Give up lock before returning.
+
 	if len(dbPath) == 0 {
 		return fmt.Errorf("FernDB path not set")
 	}

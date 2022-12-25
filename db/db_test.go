@@ -4,6 +4,7 @@
 package db
 
 import (
+	"fmt"
 	"os"
 	"path"
 	"testing"
@@ -368,5 +369,51 @@ func TestWriteExistingDB(t *testing.T) {
 		t.Errorf("db.Add failed: expected %s in 'mkbhd' feed",
 			"v-raptor")
 		return
+	}
+}
+
+func TestConcurrentWrites(t *testing.T) {
+	dbPath = path.Join(os.TempDir(), "fern-db.json")
+	defer os.Remove(dbPath)
+	defer resetDBPath()
+
+	db, err := Open()
+	if err != nil {
+		t.Errorf("db open failed: %v", err)
+		return
+	}
+
+	// Randomly create a some entries.
+	numEntries := 1000
+	entries := make([]string, 0)
+	for i := 0; i < numEntries; i++ {
+		entries = append(entries, fmt.Sprintf("entry-%d", i))
+	}
+
+	// Go routine for adding entries to the db.
+	addEntries := func(db *FernDB, feed string, entries []string, donec chan int) {
+		for _, entry := range entries {
+			db.Add(feed, entry)
+		}
+		donec <- 1
+	}
+
+	// Concurrently write entries to a feed.
+	donec := make(chan int)
+	feed := "npr"
+	routines := 5
+	for i := 0; i < routines; i++ {
+		go addEntries(db, feed, entries, donec)
+	}
+	routinesDone := 0
+	for routinesDone != routines {
+		<-donec
+		routinesDone += 1
+	}
+
+	// Check if there are exactly numEntries entries.
+	if len(db.downloaded[feed]) != numEntries {
+		t.Errorf("downloaded entries != %d: %v",
+			numEntries, db.downloaded[feed])
 	}
 }
