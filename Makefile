@@ -4,7 +4,7 @@
 MOD=ricketyspace.net/fern
 
 fern: fmt fix vet
-	go build
+	go build -race
 
 fmt:
 	go fmt ./...
@@ -16,5 +16,5 @@ vet:
 	go vet ./...
 
 test:
-	go test ${MOD}/db ${MOD}/feed ${MOD}/file ${MOD}/schema
+	go test -race ${MOD}/db ${MOD}/feed ${MOD}/file ${MOD}/schema
 .PHONY: test
