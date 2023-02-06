@@ -153,6 +153,10 @@ func (feed *Feed) Process(pState *state.ProcessState) {
 	traversed := 0
 	// Channel for receiving entry results.
 	erChan := make(chan state.EntryResult)
+	// Simple semaphore to limit the number of concurrent
+	// processEntry calls.
+	// https://go.dev/doc/effective_go#channels
+	eSem := make(chan int, 10)
 	for _, entry := range feed.Entries {
 		e := entry
 
@@ -167,7 +171,7 @@ func (feed *Feed) Process(pState *state.ProcessState) {
 
 		// Process entry only if it was not downloaded before.
 		if !pState.DB.Exists(feed.Id, e.Id) {
-			go feed.processEntry(e, erChan)
+			go feed.processEntry(e, erChan, eSem)
 			processing += 1
 		} else {
 			fmt.Printf("[%s][%s]: Already downloaded '%s' before\n",
@@ -211,7 +215,10 @@ func (feed *Feed) Process(pState *state.ProcessState) {
 	pState.FeedResultChan <- fr
 }
 
-func (feed *Feed) processEntry(entry schema.Entry, erc chan state.EntryResult) {
+func (feed *Feed) processEntry(entry schema.Entry, erc chan state.EntryResult,
+	sema chan int) {
+	sema <- 1 // Wait for semaphore.
+
 	// Init EntryResult.
 	er := state.EntryResult{
 		EntryId:    entry.Id,
@@ -227,6 +234,8 @@ func (feed *Feed) processEntry(entry schema.Entry, erc chan state.EntryResult) {
 		er.Err = err
 	}
 	erc <- er
+
+	<-sema // Give up token.
 }
 
 func (feed *Feed) ydl(entry schema.Entry) error {
