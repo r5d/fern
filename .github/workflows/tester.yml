@@ -4,8 +4,9 @@ on: push
 jobs:
   test:
     name: test fern
-    matrix:
-      os: [ubuntu-latest, macos-latest]
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macos-latest]
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v4
