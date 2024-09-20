@@ -1,9 +1,7 @@
-name: tester
-run-name: run fern tests
+name: Run tests
 on: push
 jobs:
   test:
-    name: test fern
     strategy:
       matrix:
         os: [ubuntu-latest, macos-latest]
