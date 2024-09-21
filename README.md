@@ -8,4 +8,6 @@ Install it with:
 go install ricketyspace.net/fern@latest
 ```
 
-See the documentation in fern.go for usage.
+Pre-built binaries are available at [ricketyspace.net/fern/releases][bins].
+
+[bin]: https://ricketyspace.net/fern/releases
