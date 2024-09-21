@@ -18,3 +18,9 @@ vet:
 test:
 	go test ${TEST_OPTS} ${MOD}/db ${MOD}/feed ${MOD}/file ${MOD}/schema
 .PHONY: test
+
+clean:
+	go clean
+	rm -f fern-*
+	rm -f Makefile.dist*
+.PHONY: clean
